@@ -11,9 +11,9 @@ and adjust the variables in accord with your application.
 Exampla of usage:
 
 ------------------------------
-<?php
+\<?php
 
-echo "<h2>Any title</h2>
+\echo "\<h2>Any title\</h2>
 <p>Please login</p>
 <form action=# method=post>
 <p>Username:<input type=text name=user></p>
