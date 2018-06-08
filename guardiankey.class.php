@@ -3,12 +3,14 @@
 // Please run "register.php" for generate your configuration
 
 $GKconfig = array(
-	$GKconfig['key'] => "",
-	$GKconfig['Salt'] => "",
-	$GKconfig['iv'] => "",
-	$GKconfig['orgid'] => "",
-	$GKconfig['groupid'] => "",
-	$GKconfig['reverse'] => "",
+	'email' => "",
+	'hashid' => "",
+	'key' => "",
+	'Salt' => "",
+	'iv' => "",
+	'orgid' => "",
+	'groupid' => "",
+	'reverse' => "",
 );
 
 class guardiankey {

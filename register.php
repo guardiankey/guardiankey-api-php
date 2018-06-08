@@ -28,13 +28,14 @@ function register($email) {
 			}
             echo  'Please add in your GuardianKey configuration: 
 					$GKconfig = array(
-					$GKconfig[\'email\'] => "'.$email.'",
-					$GKconfig[\'key\'] => "'.$keyb64.'",
-					$GKconfig[\'Salt\'] => "'.$salt.'",
-					$GKconfig[\'iv\'] => "'.$ivb64.'",
-					$GKconfig[\'orgid\'] => "",
-					$GKconfig[\'groupid\'] => "",
-					$GKconfig[\'reverse\'] => "1",
+					\'email\' => "'.$email.'",
+					\'hashid\' => "'.$hashid.'",
+					\'key\' => "'.$keyb64.'",
+					\'Salt\' => "'.$salt.'",
+					\'iv\' => "'.$ivb64.'",
+					\'orgid\' => "",
+					\'groupid\' => "",
+					\'reverse\' => "1",
 					);';
 }
 
