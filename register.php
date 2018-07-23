@@ -3,7 +3,7 @@
 define('AES_256_CBC', 'aes-256-cbc');
 
 function register($email) {
-			$guardianKeyWS='http://ws.guardiankey.net/';
+			$guardianKeyWS='https://api.guardiankey.io/register';
             // Create new Key
             $key = openssl_random_pseudo_bytes(32);
             $iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length(AES_256_CBC));
