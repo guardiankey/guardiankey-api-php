@@ -1,7 +1,7 @@
 <?php
+/* Dependencies: php-curl */
 
 define('AES_256_CBC', 'aes-256-cbc');
-
 function register($email) {
 			$guardianKeyWS='https://api.guardiankey.io/register';
             // Create new Key
@@ -9,10 +9,27 @@ function register($email) {
             $iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length(AES_256_CBC));
             $keyb64 = base64_encode($key);
             $ivb64 =  base64_encode($iv);
+            /* Optionally, you can set the notification parameters, such as:
+              - notify_method: email or webhook
+			  - notify_data: A base64-encoded json containing URL (if method is webhook), server and SMTP port, user, and email password.
+		Example for e-mail:
+			$notify_method = 'email';
+			$notify_data = base64_encode('{"smtp_method":"TLS","smtp_host":"smtp.example.foo","smtp_port":"587","smtp_user":"myuser","smtp_pass":"mypass"}');
+		Example for webhook:
+		    $notify_method = 'webhook';
+			$notify_data = base64_encode('{"webhook_url":"https://myorganization.com/guardiankey.php"}');
+			*/
+
+$notify_method = 'email';
+$notify_data = base64_encode('{"url":"https://example.foo/guardiankey/webhook.php","server":"smtp.example.foo:587","username":"fulano","password":"mypass"}');
+            $notify_data = base64_encode('{"webhook_url":"http://site.example.com/gk.php"}');
 			$data = array(
 					'email' => $email,
 					'keyb64' => $keyb64,
-					'ivb64' => $ivb64
+					'ivb64' => $ivb64,
+					/*Uncoment if you defined notify options
+					 'notify_method' => 'webhook',
+					'notify_data' => $notify_data*/
 					);
 			$ch = curl_init();
 			curl_setopt($ch,CURLOPT_URL, $guardianKeyWS);
@@ -21,7 +38,6 @@ function register($email) {
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 			$hashid = curl_exec($ch);
 			curl_close($ch);
-
             $salt = md5(rand().rand().rand().rand().$hashid);
 			if ($_SERVER['SERVER_NAME']) {
 				echo "<pre>";
@@ -38,7 +54,6 @@ function register($email) {
 					\'reverse\' => "1",
 					);';
 }
-
 if ($_SERVER['SERVER_NAME']) {
 	if ($_POST) {
 		$email = $_POST['email'];
@@ -55,7 +70,5 @@ if ($_SERVER['SERVER_NAME']) {
 		$handle = fopen ("php://stdin","r");
 		$email = trim(fgets($handle));	
 	}
-
 register($email);
-
 
