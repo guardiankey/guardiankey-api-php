@@ -20,15 +20,12 @@ function register($email) {
 			$notify_data = base64_encode('{"webhook_url":"https://myorganization.com/guardiankey.php"}');
 			*/
 
-$notify_method = 'email';
-$notify_data = base64_encode('{"url":"https://example.foo/guardiankey/webhook.php","server":"smtp.example.foo:587","username":"fulano","password":"mypass"}');
-            $notify_data = base64_encode('{"webhook_url":"http://site.example.com/gk.php"}');
 			$data = array(
 					'email' => $email,
 					'keyb64' => $keyb64,
 					'ivb64' => $ivb64,
 					/*Uncoment if you defined notify options
-					 'notify_method' => 'webhook',
+					 'notify_method' => $notify_method,
 					'notify_data' => $notify_data*/
 					);
 			$ch = curl_init();
