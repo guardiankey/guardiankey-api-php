@@ -1,20 +1,19 @@
 <?php
 // Please run "register.php" for generate your configuration
 $GKconfig = array(
-	'email' => "",
-	'hashid' => "",
-	'key' => "",
-	'Salt' => "",
-	'iv' => "",
-	'orgid' => "",
-	'groupid' => "",
-	'reverse' => "",
-);
+                                'email' => "",
+                                'hashid' => "",
+                                'key' => "",
+                                'iv' => "",
+                                'orgid' => "",
+                                'groupid' => "",
+                                'Salt' => "",
+                                'reverse' => "",
+                                );
 
 function convert_before_json(&$item, $key) {
          $item = utf8_encode($item);
 }
-
 class guardiankey {
 
 function _json_encode($obj) {
@@ -22,13 +21,13 @@ function _json_encode($obj) {
         return json_encode($obj,JSON_UNESCAPED_SLASHES);
 }
 
-	function create_message($username) {
+function create_message($username) {
 		global $GKconfig;
-		
+	echo "aaaaaa";	
         $keyb64    = $GKconfig['key'];
         $salt      = $GKconfig['Salt'];
         $ivb64 	   = $GKconfig['iv'];
-        $hashid    = $GKconfig['id'];
+        $hashid    = $GKconfig['hashid'];
         $orgid     = $GKconfig['orgid'];
         $authgroupid    = $GKconfig['groupid'];
         $reverse   = $GKconfig['reverse'];
@@ -59,21 +58,24 @@ function _json_encode($obj) {
 		  return $cipher;
 		}
 	}
-    function send_event($username)  {
 	
+    function send_event($username,$hashid)  {
+	echo "enviando msg";
+ 	global $GKconfig;
           // some PHP versions needs it.. aff
-		  $cipher = create_message($username);
-          $payload=$hashid."|".$cipher;
+	  $cipher = $this->create_message($username);
+          $payload = $GKconfig['hashid']."|".$cipher;
           $socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
           socket_sendto($socket, $payload, strlen($payload), 0, "collector.guardiankey.net", "8888");
         
     }
     
     function check_access($username) {
-		$guardianKeyWS='https://api.guardiankey.io/checkaccess';
-		$message = create_message($username);
+	$GKconfig['hashid'];
+	$guardianKeyWS='https://api.guardiankey.io/checkaccess';
+	$message = create_message($username);
         $data = array(
-					'hashid' => $hashid,
+					'hashid' => $GKconfig['hashid'],
 					'message' => $message
 					);
           $ch = curl_init();
@@ -86,4 +88,4 @@ function _json_encode($obj) {
 			return $return;
 		}
 	}
-}
+?>
