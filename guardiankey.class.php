@@ -74,13 +74,14 @@ function create_message($username) {
 	$GKconfig['hashid'];
 	$guardianKeyWS='https://api.guardiankey.io/checkaccess';
 	$message = create_message($username);
-        $data = array(
-					'hashid' => $GKconfig['hashid'],
-					'message' => $message
-					);
+    $tmpdata->hashid = $GKconfig['hashid'];
+	$tmpdata->message = $message;
+	$data = json_encode($tmpdata);
+					
           $ch = curl_init();
 			curl_setopt($ch,CURLOPT_URL, $guardianKeyWS);
 			curl_setopt($ch,CURLOPT_POST, true);
+			curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
 			curl_setopt($ch,CURLOPT_POSTFIELDS, $data);
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 			$return = curl_exec($ch);
