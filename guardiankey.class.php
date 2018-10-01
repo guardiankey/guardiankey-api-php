@@ -1,31 +1,27 @@
 <?php
 // Please run "register.php" for generate your configuration
-$GKconfig = array(
-                                'email' => "",
-                                'hashid' => "",
-                                'key' => "",
-                                'iv' => "",
-                                'orgid' => "",
-                                'groupid' => "",
-                                'Salt' => "",
-                                'reverse' => "",
-                                );
+        $GKconfig = array(
+                                        'email' => "ge.sielbernardes@gmail.com",
+                                        'hashid' => "2958f41c52fceb885a2217ff2d38d7c2",
+                                        'key' => "XIEda0IIxk7Ruk8lNYg3mrbX4ENQPPIwQhjaZjvHO+w=",
+                                        'iv' => "ZaLu9/GwDqpZjFoucd5k7A==",
+                                        'orgid' => "2958f41c52fceb885a2217ff2d38d7c2",
+                                        'groupid' => "2958f41c52fceb885a2217ff2d38d7c2",
+                                        'reverse' => "1",
+                                        );
 
-function convert_before_json(&$item, $key) {
-         $item = utf8_encode($item);
-}
+
 class guardiankey {
 
-function _json_encode($obj) {
-        array_walk_recursive($obj, "convert_before_json");
-        return json_encode($obj,JSON_UNESCAPED_SLASHES);
-}
+   function _json_encode($obj) {
+         array_walk_recursive($obj, function (&$item, $key) {
+                                           $item = utf8_encode($item);
+                                     });
+    }
 
-function create_message($username) {
-		global $GKconfig;
-	echo "aaaaaa";	
+   function create_message($username) {
+			global $GKconfig;
         $keyb64    = $GKconfig['key'];
-        $salt      = $GKconfig['Salt'];
         $ivb64 	   = $GKconfig['iv'];
         $hashid    = $GKconfig['hashid'];
         $orgid     = $GKconfig['orgid'];
@@ -39,8 +35,8 @@ function create_message($username) {
           $json = new stdClass();
           $json->generatedTime=$timestamp;
           $json->agentId=$hashid;
-          $json->organizationId=$hashid;
-          $json->authGroupId=$hashid;
+          $json->organizationId=$orgid;
+          $json->authGroupId=$authgroupid;
           $json->service=$GKconfig['service'];;
           $json->clientIP=$_SERVER['REMOTE_ADDR'];
           $json->clientReverse = ($reverse==1)?  gethostbyaddr($json->clientIP) : "";
@@ -59,34 +55,35 @@ function create_message($username) {
 		}
 	}
 	
-    function send_event($username,$hashid)  {
-	echo "enviando msg";
- 	global $GKconfig;
-          // some PHP versions needs it.. aff
-	  $cipher = $this->create_message($username);
-          $payload = $GKconfig['hashid']."|".$cipher;
-          $socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
-          socket_sendto($socket, $payload, strlen($payload), 0, "collector.guardiankey.net", "8888");
-        
+    function sendevent($username)  {
+ 	    global $GKconfig;
+        $hashid  = $GKconfig['hashid'];
+	    $cipher  = $this->create_message($username);
+        $payload = $GKconfig['hashid']."|".$cipher;
+        $socket  = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
+        socket_sendto($socket, $payload, strlen($payload), 0, "collector.guardiankey.net", "8888");
     }
     
-    function check_access($username) {
-	$GKconfig['hashid'];
-	$guardianKeyWS='https://api.guardiankey.io/checkaccess';
-	$message = create_message($username);
-    $tmpdata->hashid = $GKconfig['hashid'];
-	$tmpdata->message = $message;
-	$data = json_encode($tmpdata);
-					
-          $ch = curl_init();
+    function checkaccess($username) {
+			global $GKconfig;
+		$guardianKeyWS='https://api.guardiankey.io/checkaccess';
+		$message = $this->create_message($username);
+		$tmpdata->id = $GKconfig['hashid'];
+		$tmpdata->message = $message;
+		$data = $this->_json_encode($tmpdata);
+				
+        $ch = curl_init();
 			curl_setopt($ch,CURLOPT_URL, $guardianKeyWS);
-			curl_setopt($ch,CURLOPT_POST, true);
-			curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");                                                                     
+			curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+				'Content-Type: application/json',                                                                                
+	            'Content-Length: ' . strlen($data)));  
 			curl_setopt($ch,CURLOPT_POSTFIELDS, $data);
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-			$return = curl_exec($ch);
-			curl_close($ch);
-			return $return;
+			curl_setopt($ch, CURLOPT_REETURNTRANSFER, 1);
+		$return = curl_exec($ch);
+		$info = curl_getinfo($ch);
+		curl_close($ch);
+		return $return;
 		}
 	}
 ?>
