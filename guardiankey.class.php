@@ -19,7 +19,7 @@ class guardiankey {
                                      });
     }
 
-   function create_message($username) {
+   function create_message($username,$attempt) {
 			global $GKconfig;
         $keyb64    = $GKconfig['key'];
         $ivb64 	   = $GKconfig['iv'];
@@ -42,7 +42,7 @@ class guardiankey {
           $json->clientReverse = ($reverse==1)?  gethostbyaddr($json->clientIP) : "";
           $json->userName=$username;
           $json->authMethod="";
-          $json->loginFailed="0";
+          $json->loginFailed=$attempt;
           $json->userAgent=substr($_SERVER['HTTP_USER_AGENT'],0,500);
           $json->psychometricTyped="";
           $json->psychometricImage="";
@@ -55,19 +55,19 @@ class guardiankey {
 		}
 	}
 	
-    function sendevent($username)  {
+    function sendevent($username,$attempt = "0")  {
  	    global $GKconfig;
         $hashid  = $GKconfig['hashid'];
-	    $cipher  = $this->create_message($username);
+	    $cipher  = $this->create_message($username,$attempt);
         $payload = $GKconfig['hashid']."|".$cipher;
         $socket  = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
         socket_sendto($socket, $payload, strlen($payload), 0, "collector.guardiankey.net", "8888");
     }
     
-    function checkaccess($username) {
+    function checkaccess($username,$attempt = "0") {
 			global $GKconfig;
 		$guardianKeyWS='https://api.guardiankey.io/checkaccess';
-		$message = $this->create_message($username);
+		$message = $this->create_message($username,$attempt);
 		$tmpdata->id = $GKconfig['hashid'];
 		$tmpdata->message = $message;
 		$data = $this->_json_encode($tmpdata);
