@@ -33,23 +33,30 @@ function register($email) {
 			curl_setopt($ch,CURLOPT_POST, true);
 			curl_setopt($ch,CURLOPT_POSTFIELDS, $data);
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-			$hashid = curl_exec($ch);
+			$agentid = curl_exec($ch);
 			curl_close($ch);
-            $salt = md5(rand().rand().rand().rand().$hashid);
-			if ($_SERVER['SERVER_NAME']) {
-				echo "<pre>";
-			}
-            echo  'Please add in your GuardianKey configuration: 
+			
+			try {
+				$returns = json_decode($agentid);
+				if ($_SERVER['SERVER_NAME']) {
+					echo "<pre>";
+				}
+				echo  'Please add in your GuardianKey configuration: 
 					$GKconfig = array(
 					\'email\' => "'.$email.'",
-					\'hashid\' => "'.$hashid.'",
+					\'agentid\' => "'.$agentid.'",
 					\'key\' => "'.$keyb64.'",
-					\'Salt\' => "'.$salt.'",
 					\'iv\' => "'.$ivb64.'",
-					\'orgid\' => "",
-					\'groupid\' => "",
-					\'reverse\' => "1",
+					\'orgid\' => "'.$returns->organizationId.'",
+					\'groupid\' => "'.$returns->authGroupId.'",
+					\'reverse\' => "True",
 					);';
+				
+				
+			} catch (Exception $e) {
+				echo  'An error ocurred';
+			}
+			
 }
 if ($_SERVER['SERVER_NAME']) {
 	if ($_POST) {
