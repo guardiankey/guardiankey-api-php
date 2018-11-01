@@ -7,7 +7,8 @@ function register($email) {
             // Create new Key
             $key = openssl_random_pseudo_bytes(32);
             $iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length(AES_256_CBC));
-            $keyb64 = base64_encode($key);
+	    $agentid = base64_encode(openssl_random_pseudo_bytes(20));
+	    $keyb64 = base64_encode($key);
             $ivb64 =  base64_encode($iv);
             /* Optionally, you can set the notification parameters, such as:
               - notify_method: email or webhook
@@ -33,12 +34,14 @@ function register($email) {
 			curl_setopt($ch,CURLOPT_POST, true);
 			curl_setopt($ch,CURLOPT_POSTFIELDS, $data);
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-			$agentid = curl_exec($ch);
+			$returned = curl_exec($ch);
 			curl_close($ch);
-			
-			try {
-				$returns = json_decode($agentid);
-				if ($_SERVER['SERVER_NAME']) {
+			$returns = @json_decode($returned);
+			if ($retuns === null) {
+				echo  'An error ocurred: '.$returned;
+			} else {
+				
+					if ($_SERVER['SERVER_NAME']) {
 					echo "<pre>";
 				}
 				echo  'Please add in your GuardianKey configuration: 
@@ -51,11 +54,7 @@ function register($email) {
 					\'groupid\' => "'.$returns->authGroupId.'",
 					\'reverse\' => "True",
 					);';
-				
-				
-			} catch (Exception $e) {
-				echo  'An error ocurred';
-			}
+				}		
 			
 }
 if ($_SERVER['SERVER_NAME']) {
