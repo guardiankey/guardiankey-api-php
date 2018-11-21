@@ -1,21 +1,9 @@
 <?php
-class GKdata{
-        public $authgroupid;
-        public $key;
-        public $iv;
-}
-function getKey() {
-        /*You need load hashid,key and iv. If you save in the database, you need find us in this function*/
-        $GK = new GKdata;
-        $GK->authgroupid = '';
-        $GK->key = '';
-        $GK->iv = '';
-        return $GK;
-}
+
+require_once("guardiankey.class.php");
 
 
 function doAction($data) {
-	$GKdata = json_decode($data);
 	
 	/*In this function do you need define what action the webhook
 	will make. Example:
@@ -40,26 +28,13 @@ function doAction($data) {
 			
 if ($_POST) {
 	
-		$GKinfo = getKey();
-		$data = json_decode(file_get_contents('php://input'), true);
-		
-        if ($data['authGroupId'] == $GKinfo->authgroupid ) {
-			$key = base64_decode($GKinfo->key);
-			$iv  = base64_decode($GKinfo->iv);
-			try {
-				$msgcrypt = base64_decode($data['data']);
-				$output = openssl_decrypt($msgcrypt, 'aes-256-cfb8', $key, 1, $iv);
-			    }
-			 catch (Exception $e) {
-				echo 'Error decrypting: ',  $e->getMessage(), "\n";
-			}
-			
-			if ($output) {
-				doAction($output);
-				
-			}
-		
-	}
+    try {
+        $GK = new guardiankey($GKconfig);
+        $output=$GK->processWebHookPost($authgroupid,$keyb64,$ivb64);
+        doAction($output);
+    } catch (Exception $e) {
+        echo "Something got wrong, probably the key do not match.\n";
+    }
 }
 
 ?>

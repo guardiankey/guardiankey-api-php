@@ -1,77 +1,47 @@
 <?php
 /* Dependencies: php-curl */
 
-define('AES_256_CBC', 'aes-256-cbc');
-function register($email) {
-			$guardianKeyWS='https://api.guardiankey.io/register';
-            // Create new Key
-            $key = openssl_random_pseudo_bytes(32);
-            $iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length(AES_256_CBC));
-	    $agentid = base64_encode(openssl_random_pseudo_bytes(20));
-	    $keyb64 = base64_encode($key);
-            $ivb64 =  base64_encode($iv);
-            /* Optionally, you can set the notification parameters, such as:
-              - notify_method: email or webhook
-			  - notify_data: A base64-encoded json containing URL (if method is webhook), server and SMTP port, user, and email password.
-		Example for e-mail:
-			$notify_method = 'email';
-			$notify_data = base64_encode('{"smtp_method":"TLS","smtp_host":"smtp.example.foo","smtp_port":"587","smtp_user":"myuser","smtp_pass":"mypass"}');
-		Example for webhook:
-		    $notify_method = 'webhook';
-			$notify_data = base64_encode('{"webhook_url":"https://myorganization.com/guardiankey.php"}');
-			*/
+require_once("guardiankey.class.php");
 
-			$data = array(
-					'email' => $email,
-					'keyb64' => $keyb64,
-					'ivb64' => $ivb64,
-					/*Uncoment if you defined notify options
-					 'notify_method' => $notify_method,
-					'notify_data' => $notify_data*/
-					);
-			$ch = curl_init();
-			curl_setopt($ch,CURLOPT_URL, $guardianKeyWS);
-			curl_setopt($ch,CURLOPT_POST, true);
-			curl_setopt($ch,CURLOPT_POSTFIELDS, $data);
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-			$returned = curl_exec($ch);
-			curl_close($ch);
-			$returns = @json_decode($returned);
-			if ($retuns === null) {
-				echo  'An error ocurred: '.$returned;
-			} else {
-				
-					if ($_SERVER['SERVER_NAME']) {
-					echo "<pre>";
-				}
-				echo  'Please add in your GuardianKey configuration: 
-					$GKconfig = array(
-					\'email\' => "'.$email.'",
-					\'agentid\' => "'.$agentid.'",
-					\'key\' => "'.$keyb64.'",
-					\'iv\' => "'.$ivb64.'",
-					\'orgid\' => "'.$returns->organizationId.'",
-					\'groupid\' => "'.$returns->authGroupId.'",
-					\'reverse\' => "True",
-					);';
-				}		
-			
-}
-if ($_SERVER['SERVER_NAME']) {
-	if ($_POST) {
-		$email = $_POST['email'];
-	} else {
-	echo "<form action=# method=post>
+
+if (@$_SERVER['SERVER_NAME']) {
+    if ($_POST) {
+        $email = $_POST['email'];
+    } else {
+        echo "<form action=# method=post>
 		<p>Please enter admin email:</p>
 		<input type=email name=email><br>
 		<input type=submit value=submit>
 	</form>";
-	die;
-	}
+        die();
+    }
 } else {
-		echo "Please enter admin email:";
-		$handle = fopen ("php://stdin","r");
-		$email = trim(fgets($handle));	
-	}
-register($email);
+    echo "Please enter admin email: ";
+    $handle = fopen("php://stdin", "r");
+    $email = trim(fgets($handle));
+}
+
+$GK = new guardiankey();
+
+try {
+    $GKReturn=$GK->register($email,"webhook",'{"webhook_url":"https://myorganization.com/guardiankey.php"}');
+} catch (Exception $e) {
+    echo $e->getMessage()."\n";
+    exit;
+}
+
+if (@$_SERVER['SERVER_NAME']) {
+    echo "<pre>";
+}
+echo 'Please add in your GuardianKey configuration:
+					$GKconfig = array(
+					\'email\' => "' . $GKReturn["email"] . '",
+					\'agentid\' => "' . $GKReturn["agentid"]  . '",
+					\'key\' => "' . $GKReturn["key"]  . '",
+					\'iv\' => "' . $GKReturn["iv"]  . '",
+					\'orgid\' => "' . $GKReturn["orgid"]  . '",
+					\'groupid\' => "' . $GKReturn["groupid"]  . '",
+					\'service\' => "MyServiceName",
+					\'reverse\' => "True",
+					);'."\n";
 
