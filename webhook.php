@@ -1,13 +1,13 @@
 <?php
 class GKdata{
-        public $hashid;
+        public $authgroupid;
         public $key;
         public $iv;
 }
 function getKey() {
         /*You need load hashid,key and iv. If you save in the database, you need find us in this function*/
         $GK = new GKdata;
-        $GK->hashid = '';
+        $GK->authgroupid = '';
         $GK->key = '';
         $GK->iv = '';
         return $GK;
@@ -21,17 +21,17 @@ function doAction($data) {
 	will make. Example:
 		- Alert by email the users, and the username is the email of the user:
 	
-	$subject = "Atypical login from ".$GKdata->city."-".$GKdata->country;
+	$subject = "Atypical login from ".$GKdata->location;
 	$message = "Hi,
 	
 			We detectead a atypical login on your account. Please view below:
-			Device:".GKdata->client_ua." - ".$GKdata->client_os."
-			IP:".$GKdata->clientIP."
-			Location: ".$GKdata->city." - ".$GKdata->region." - ".$GKdata->country."
+			Device:".GKdata->system."
+			IP:".$GKdata->ipaddress."
+			Location: ".$GKdata->location."
 			
 			If is not you, tell the System Administrator";
 			
-	mail($GKdata->userName,$subject,$message);
+	mail($GKdata->username,$subject,$message);
 	
 			*/
 }		
@@ -41,12 +41,13 @@ function doAction($data) {
 if ($_POST) {
 	
 		$GKinfo = getKey();
+		$data = json_decode(file_get_contents('php://input'), true);
 		
-        if ($_POST['hashid'] == $GKinfo->hashid ) {
+        if ($data['authGroupId'] == $GKinfo->authgroupid ) {
 			$key = base64_decode($GKinfo->key);
 			$iv  = base64_decode($GKinfo->iv);
 			try {
-				$msgcrypt = base64_decode($_POST['data']);
+				$msgcrypt = base64_decode($data['data']);
 				$output = openssl_decrypt($msgcrypt, 'aes-256-cfb8', $key, 1, $iv);
 			    }
 			 catch (Exception $e) {

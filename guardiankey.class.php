@@ -24,7 +24,7 @@ class guardiankey {
 			global $GKconfig;
         $keyb64    = $GKconfig['key'];
         $ivb64 	   = $GKconfig['iv'];
-        $hashid    = $GKconfig['age'];
+        $agentid    = $GKconfig['agentid'];
         $orgid     = $GKconfig['orgid'];
         $authgroupid    = $GKconfig['groupid'];
         $reverse   = $GKconfig['reverse'];
