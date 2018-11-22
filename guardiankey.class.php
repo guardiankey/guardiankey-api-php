@@ -197,7 +197,8 @@ class guardiankey
             $authgroupid = $GKconfig['authgroupid'];
         }
         
-        $data = json_decode(file_get_contents('php://input'), true);
+        $data['authGroupId'] = $_POST['authGroupId'];
+        $data['data'] = $_POST['data'];
         
         if ($data['authGroupId'] == $authgroupid ) {
             $key = base64_decode($keyb64);
@@ -205,7 +206,7 @@ class guardiankey
             try {
                 $msgcrypt = base64_decode($data['data']);
                 $output = openssl_decrypt($msgcrypt, 'aes-256-cfb8', $key, 1, $iv);
-                $dataReturn=json_decode($output);
+                $dataReturn=json_decode($output,true);
             } catch (Exception $e) {
                 throw $e; // 'Error decrypting: ',  $e->getMessage(), "\n";
             }
