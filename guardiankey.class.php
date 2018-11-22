@@ -53,7 +53,7 @@ class guardiankey
         $ivb64 = $GKconfig['iv'];
         $agentid = $GKconfig['agentid'];
         $orgid = $GKconfig['orgid'];
-        $authgroupid = $GKconfig['groupid'];
+        $authgroupid = $GKconfig['authgroupid'];
         $reverse = $GKconfig['reverse'];
         $timestamp = time();
         if (strlen($agentid) > 0) {
@@ -89,7 +89,7 @@ class guardiankey
     {
         $GKconfig = $this->GKconfig;
         $cipher = $this->create_message($username, $useremail, $attempt, $eventType);
-        $payload = $GKconfig['groupid'] . "|" . $cipher;
+        $payload = $GKconfig['authgroupid'] . "|" . $cipher;
         $socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
         socket_sendto($socket, $payload, strlen($payload), 0, "collector.guardiankey.net", "8888");
     }
@@ -100,7 +100,7 @@ class guardiankey
         $guardianKeyWS = 'https://api.guardiankey.io/checkaccess';
         $message = $this->create_message($username, $useremail, $attempt, $eventType);
         $tmpdata = new stdClass();
-        $tmpdata->id = $GKconfig['groupid'];
+        $tmpdata->id = $GKconfig['authgroupid'];
         $tmpdata->message = $message;
         $data = $this->_json_encode($tmpdata);
 
@@ -194,7 +194,7 @@ class guardiankey
             $GKconfig = $this->GKconfig;
             $keyb64 = $GKconfig['key'];
             $ivb64 = $GKconfig['iv'];
-            $authgroupid = $GKconfig['groupid'];
+            $authgroupid = $GKconfig['authgroupid'];
         }
         
         $data = json_decode(file_get_contents('php://input'), true);

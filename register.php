@@ -40,7 +40,7 @@ echo 'Please add in your GuardianKey configuration:
 					\'key\' => "' . $GKReturn["key"]  . '",
 					\'iv\' => "' . $GKReturn["iv"]  . '",
 					\'orgid\' => "' . $GKReturn["orgid"]  . '",
-					\'groupid\' => "' . $GKReturn["groupid"]  . '",
+					\'authgroupid\' => "' . $GKReturn["groupid"]  . '",
 					\'service\' => "MyServiceName",
 					\'reverse\' => "True",
 					);'."\n";
