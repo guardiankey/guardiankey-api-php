@@ -6,7 +6,6 @@ class guardiankey
 {
 
     private $GKconfig = array(
-                                'email' => "",   /* Admin e-mail */
                                 'agentid' => "",  /* ID for the agent (your system) */
                                 'key' => "",     /* Key in B64 to communicate with GuardianKey */
                                 'iv' => "",      /* IV in B64 for the key */
@@ -47,7 +46,7 @@ class guardiankey
         return json_encode($obj);
     }
 
-    function create_message($username, $attempt = 0, $eventType)
+    function create_message($username, $useremail="", $attempt = 0, $eventType="Authentication")
     {
         $GKconfig = $this->GKconfig;
         $keyb64 = $GKconfig['key'];
@@ -67,17 +66,16 @@ class guardiankey
             $json->organizationId = $orgid;
             $json->authGroupId = $authgroupid;
             $json->service = $GKconfig['service'];
-            
             $json->clientIP = $_SERVER['REMOTE_ADDR'];
             $json->clientReverse = ($reverse == "True") ? gethostbyaddr($json->clientIP) : "";
             $json->userName = $username;
             $json->authMethod = "";
-            $json->eventType = $eventType;
             $json->loginFailed = $attempt;
             $json->userAgent = substr($_SERVER['HTTP_USER_AGENT'], 0, 500);
             $json->psychometricTyped = "";
             $json->psychometricImage = "";
-
+            $json->event_type=$eventType; // "Authentication" "Bad access"  ou "Registration"
+            $json->userEmail=$useremail;
             $tmpmessage = $this->_json_encode($json);
             $blocksize = 8;
             $padsize = $blocksize - (strlen($tmpmessage) % $blocksize);
@@ -87,20 +85,20 @@ class guardiankey
         }
     }
 
-    function sendevent($username, $attempt = "0", $eventType = 'Authentication')
+    function sendevent($username, $useremail="", $attempt = "0", $eventType = 'Authentication')
     {
         $GKconfig = $this->GKconfig;
-        $cipher = $this->create_message($username, $attempt, $eventType);
+        $cipher = $this->create_message($username, $useremail, $attempt, $eventType);
         $payload = $GKconfig['groupid'] . "|" . $cipher;
         $socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
         socket_sendto($socket, $payload, strlen($payload), 0, "collector.guardiankey.net", "8888");
     }
 
-    function checkaccess($username, $attempt = "0", $eventType = 'Authentication')
+    function checkaccess($username, $useremail="", $attempt = "0", $eventType = 'Authentication')
     {
         $GKconfig = $this->GKconfig;
         $guardianKeyWS = 'https://api.guardiankey.io/checkaccess';
-        $message = $this->create_message($username, $attempt, $eventType);
+        $message = $this->create_message($username, $useremail, $attempt, $eventType);
         $tmpdata = new stdClass();
         $tmpdata->id = $GKconfig['groupid'];
         $tmpdata->message = $message;
@@ -189,8 +187,16 @@ class guardiankey
         }
     }
     
-    function processWebHookPost($authgroupid,$keyb64,$ivb64)
+    function processWebHookPost($authgroupid=null,$keyb64=null,$ivb64=null)
     {
+        
+        if($authgroupid==null){
+            $GKconfig = $this->GKconfig;
+            $keyb64 = $GKconfig['key'];
+            $ivb64 = $GKconfig['iv'];
+            $authgroupid = $GKconfig['groupid'];
+        }
+        
         $data = json_decode(file_get_contents('php://input'), true);
         
         if ($data['authGroupId'] == $authgroupid ) {
