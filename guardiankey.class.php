@@ -161,7 +161,7 @@ class guardiankey
                 'keyb64' => $keyb64,
                 'ivb64' => $ivb64,
                 'notify_method' => $notify_method,
-                'notify_data' => base64_encode($notify_data_json)
+                'notify_data' => $notify_data_json
             );
         }
         
