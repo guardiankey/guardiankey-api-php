@@ -85,7 +85,7 @@ class guardiankey
         }
     }
 
-    function sendevent($username, $useremail="", $attempt = "0", $eventType = 'Authentication')
+    function sendevent_udp($username, $useremail="", $attempt = "0", $eventType = 'Authentication')
     {
         $GKconfig = $this->GKconfig;
         $cipher = $this->create_message($username, $useremail, $attempt, $eventType);
@@ -93,6 +93,31 @@ class guardiankey
         $socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
         socket_sendto($socket, $payload, strlen($payload), 0, "collector.guardiankey.net", "8888");
     }
+   
+   function sendevent($username, $useremail="", $attempt = "0", $eventType = 'Authentication')
+    {
+       $GKconfig = $this->GKconfig;
+        $guardianKeyWS = 'https://api.guardiankey.io/sendevent';
+        $message = $this->create_message($username, $useremail, $attempt, $eventType);
+        $tmpdata = new stdClass();
+        $tmpdata->id = $GKconfig['authgroupid'];
+        $tmpdata->message = $message;
+        $data = $this->_json_encode($tmpdata);
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $guardianKeyWS);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+            'Content-Type: application/json',
+            'Content-Length: ' . strlen($data)
+        ));
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        $return = curl_exec($ch);
+        curl_close($ch);
+    }
+
+
 
     function checkaccess($username, $useremail="", $attempt = "0", $eventType = 'Authentication')
     {
