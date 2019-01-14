@@ -105,6 +105,7 @@ class guardiankey
         $data = $this->_json_encode($tmpdata);
 
         $ch = curl_init();
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 1);
         curl_setopt($ch, CURLOPT_URL, $guardianKeyWS);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
         curl_setopt($ch, CURLOPT_HTTPHEADER, array(
@@ -130,6 +131,7 @@ class guardiankey
         $data = $this->_json_encode($tmpdata);
 
         $ch = curl_init();
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 1);
         curl_setopt($ch, CURLOPT_URL, $guardianKeyWS);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
         curl_setopt($ch, CURLOPT_HTTPHEADER, array(
