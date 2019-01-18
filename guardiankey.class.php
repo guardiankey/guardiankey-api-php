@@ -46,6 +46,22 @@ class guardiankey
         return json_encode($obj);
     }
 
+
+    function getUserIP()
+    {
+        if( array_key_exists('HTTP_X_FORWARDED_FOR', $_SERVER) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']) ) {
+            if (strpos($_SERVER['HTTP_X_FORWARDED_FOR'], ',')>0) {
+                $addr = explode(",",$_SERVER['HTTP_X_FORWARDED_FOR']);
+                return trim($addr[0]);
+            } else {
+                return $_SERVER['HTTP_X_FORWARDED_FOR'];
+            }
+        } else {
+            return $_SERVER['REMOTE_ADDR'];
+        }
+    }
+
+
     function create_message($username, $useremail="", $attempt = 0, $eventType="Authentication")
     {
         $GKconfig = $this->GKconfig;
@@ -66,7 +82,7 @@ class guardiankey
             $json->organizationId = $orgid;
             $json->authGroupId = $authgroupid;
             $json->service = $GKconfig['service'];
-            $json->clientIP = $_SERVER['REMOTE_ADDR'];
+            $json->clientIP = $this->getUserIP();
             $json->clientReverse = ($reverse == "True") ? gethostbyaddr($json->clientIP) : "";
             $json->userName = $username;
             $json->authMethod = "";
@@ -132,6 +148,7 @@ class guardiankey
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 1);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 4);
         curl_setopt($ch, CURLOPT_URL, $guardianKeyWS);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
         curl_setopt($ch, CURLOPT_HTTPHEADER, array(
