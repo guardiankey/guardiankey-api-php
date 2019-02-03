@@ -17,7 +17,8 @@ function doAction($data) {
 			IP:".$GKdata->ipaddress."
 			Location: ".$GKdata->location."
 			
-			If is not you, tell the System Administrator";
+			Please confirm in link below if are you or not:
+			".$GKconfig['resolveEventURL']."?t=".$GKdata['EVENTTOKEN']."&e=".$GKdata['EVENTID'].";
 			
 	mail($GKdata->username,$subject,$message);
 	
