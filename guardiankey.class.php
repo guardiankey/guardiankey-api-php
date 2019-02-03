@@ -286,7 +286,6 @@ class guardiankey
         return $return;
     }
     
-    // $eventResponse = GOOD or BAD
     function getEvent($eventId, $token)
     {
         $GKconfig = $this->GKconfig;
