@@ -259,5 +259,58 @@ class guardiankey
             
         }   
     }
+    
+    // $eventResponse = GOOD or BAD
+    function resolveEvent($eventId, $token, $eventResponse)
+    {
+        $GKconfig = $this->GKconfig;
+        $guardianKeyWS = 'https://api.guardiankey.io/resolveevent';
+        $tmpdata = new stdClass();
+        $tmpdata->eventid = $eventId;
+        $tmpdata->token = $token;
+        $tmpdata->action = $eventResponse;
+        $data = $this->_json_encode($tmpdata);
+        
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 1);
+        curl_setopt($ch, CURLOPT_URL, $guardianKeyWS);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+            'Content-Type: application/json',
+            'Content-Length: ' . strlen($data)
+        ));
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        $return = curl_exec($ch);
+        curl_close($ch);
+        return $return;
+    }
+    
+    // $eventResponse = GOOD or BAD
+    function getEvent($eventId, $token)
+    {
+        $GKconfig = $this->GKconfig;
+        $guardianKeyWS = 'https://api.guardiankey.io/getevent';
+        $tmpdata = new stdClass();
+        $tmpdata->eventid = $eventId;
+        $tmpdata->token = $token;
+        $data = $this->_json_encode($tmpdata);
+        
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 1);
+        curl_setopt($ch, CURLOPT_URL, $guardianKeyWS);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+            'Content-Type: application/json',
+            'Content-Length: ' . strlen($data)
+        ));
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        $return = curl_exec($ch);
+        curl_close($ch);
+        return json_decode($return);
+    }
+    
+    
 }
 ?>
