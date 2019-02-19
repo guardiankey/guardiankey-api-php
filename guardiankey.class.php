@@ -243,8 +243,7 @@ class guardiankey
             $authgroupid = $GKconfig['authgroupid'];
         }
         
-        $data['authGroupId'] = $_POST['authGroupId'];
-        $data['data'] = $_POST['data'];
+        $data = json_decode(file_get_contents('php://input'), true);
         
         if ($data['authGroupId'] == $authgroupid ) {
             $key = base64_decode($keyb64);
