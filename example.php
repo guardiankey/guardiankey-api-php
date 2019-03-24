@@ -26,7 +26,7 @@ if (@$_SERVER['SERVER_NAME']) {
     <input type=submit value=submit>
     </form>";
     if ($_POST) {
-        $GK->sendevent($username);
+        $GK->sendevent($_POST['user']);
         echo "<h2>Any data</h2>";
     }
 }else{

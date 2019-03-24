@@ -24,7 +24,7 @@ if (@$_SERVER['SERVER_NAME']) {
 $GK = new guardiankey();
 
 try {
-    $GKReturn=$GK->register($email,"webhook",'{"webhook_url":"https://myorganization.com/guardiankey.php"}');
+    $GKReturn=$GK->register($email);
 } catch (Exception $e) {
     echo $e->getMessage()."\n";
     exit;
