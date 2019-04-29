@@ -29,17 +29,7 @@ $page['title'] = _('ZABBIX');
 $page['file'] = 'index.php';
 
 require_once("guardiankey/guardiankey.class.php");
-
-$GKconfig = array(
-                                        'email' => "email_registered_in_GK@example.com",
-                                        'agentid' => "xxxxxxxxxxxxxxxxxxxxxxx",
-                                        'key' => "xxxxxxxxxxxxxxx",
-                                        'iv' => "xxxxxxxxxxxxxx",
-                                        'orgid' => "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-                                        'authgroupid' => "xxxxxxxxxxxxxxxxxxxxxxxx",
-                                        'service' => "Zabbix",
-                                        'reverse' => "True",
-                                        );
+include("guardiankey/gk_register.php");
 
 $GK = new guardiankey($GKconfig);
 
