@@ -24,6 +24,10 @@ if ($_POST) {
 
 $returned = $GK->getEvent($eventid,$token); 
 
+// Adjust the timezone
+date_default_timezone_set("America/Sao_Paulo");
+$returned->DATETIME=$returned->DATETIME+date("Z");
+
 if ($returned->return) {
 	echo "Invalid token";
 } else {
