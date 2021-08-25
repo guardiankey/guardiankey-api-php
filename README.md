@@ -8,4 +8,4 @@ INSTALATION AND USAGE
   You need include guardiankey.class.php in your code (eg: In post-auth page),
 and adjust the variables in accord with your application. 
 
-Please see "example.php" for a example.
+Please see "example2.php" for a example.
