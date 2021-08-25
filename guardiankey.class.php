@@ -171,7 +171,7 @@ class guardiankey
         ));
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_VERBOSE, true);
+        //curl_setopt($ch, CURLOPT_VERBOSE, true);
         $return = curl_exec($ch);
         $info = curl_getinfo($ch);
         curl_close($ch);
