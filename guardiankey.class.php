@@ -185,6 +185,73 @@ class guardiankey
         }
     }
 
+    function create_gktinc_msg($sa,$o1,$o2,$username,$mh, $su)
+    {
+        $GKconfig = $this->GKconfig;
+        $agentid = $GKconfig['agentid'];
+        $orgid = $GKconfig['orgid'];
+        $authgroupid = $GKconfig['authgroupid'];
+        $timestamp = time();
+        if (strlen($agentid) > 0) {
+            $json = new stdClass();
+            $json->timestamp = $timestamp;
+            $json->agent_id = $agentid;
+            $json->organization_id = $orgid;
+            $json->authgroup_id = $authgroupid;
+            $json->service = $GKconfig['service'];
+            $json->sa = $sa;
+            $json->o1 = $o1;
+            $json->o2 = $o2;
+            $json->username = $username;
+            $json->mh = $mh;
+            $json->p = "";
+            $json->su = $su;
+            $tmpmessage = $this->_json_encode($json);
+            return $tmpmessage;
+        }
+    }
+
+
+    function checkgktinc($sa,$o1,$o2,$username,$mh, $su)
+    {
+        $GKconfig = $this->GKconfig;
+        $guardianKeyWS = 'https://api.guardiankey.io/v2/checkgktinc';
+        $keyb64 = $GKconfig['key'];
+        $ivb64 = $GKconfig['iv'];
+        $message = $this->create_gktinc_msg($sa,$o1,$o2,$username,$mh, $su);
+        $tmpdata = new stdClass();
+        $tmpdata->id = $GKconfig['authgroupid'];
+        $tmpdata->message = $message;
+        $tmpdata->hash = hash("sha256", $message.$keyb64.$ivb64);
+
+        $data = $this->_json_encode($tmpdata);
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 1);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 4);
+        curl_setopt($ch, CURLOPT_URL, $guardianKeyWS);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+            'Content-Type: application/json',
+            'Content-Length: ' . strlen($data)
+        ));
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        //curl_setopt($ch, CURLOPT_VERBOSE, true);
+        $return = curl_exec($ch);
+        $info = curl_getinfo($ch);
+        curl_close($ch);
+        
+        
+        try {
+            $foo = json_decode($return);
+            return $return;
+        } catch (Exception $e) {
+            return '{"response":"ERROR"}';
+        }
+    }
+
+
     function checkaccessv1($username, $useremail="", $attempt = "0", $eventType = 'Authentication')
     {
         $GKconfig = $this->GKconfig;
