@@ -145,6 +145,10 @@ class guardiankey
         curl_close($ch);
     }
 
+    function checktransaction($username, $useremail="", $attempt = "0")
+    {
+        return $this->checkaccess($username, $useremail, $attempt, 'Transaction');
+    }
 
     function checkaccess($username, $useremail="", $attempt = "0", $eventType = 'Authentication')
     {
