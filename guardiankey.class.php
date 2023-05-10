@@ -152,6 +152,7 @@ class guardiankey
 
     function checkaccess($username, $useremail="", $attempt = "0", $eventType = 'Authentication')
     {
+        try {
         $GKconfig = $this->GKconfig;
         $guardianKeyWS = 'https://api.guardiankey.io/v2/checkaccess';
         $keyb64 = $GKconfig['key'];
@@ -181,7 +182,6 @@ class guardiankey
         curl_close($ch);
         
         
-        try {
             $foo = json_decode($return);
             return $return;
         } catch (Exception $e) {
